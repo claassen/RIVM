@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using VirtualMachine.VMInstructions;
 
-namespace VirtualMachine.Instructions
+namespace RIVM.Instructions
 {
     public static class InstructionDecoder
     {
@@ -12,6 +11,7 @@ namespace VirtualMachine.Instructions
             { OpCodes.ADDR,    (value) => new AddR(value) },
             { OpCodes.ANDR,    (value) => new AndR(value) },
             { OpCodes.CALL,    (value) => new Call(value) },
+            { OpCodes.RET,     (value) => new Ret(value) },
             { OpCodes.CMPI,    (value) => new CmpI(value) },
             { OpCodes.CMPR,    (value) => new CmpR(value) },
             { OpCodes.DIVR,    (value) => new DivR(value) },

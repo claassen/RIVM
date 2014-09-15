@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VirtualMachine.VMInstructions
+namespace RIVM.Instructions
 {
     //11111111 1xxx 1111 1111 1111 1111     1111    [next instruction]
     //OPCODE   MB   r1   r2   r3   <unused> # bytes immediate value (MB = 1)
@@ -120,7 +120,25 @@ namespace VirtualMachine.VMInstructions
 
         protected override void ExecuteImpl(CPU cpu)
         {
-            throw new NotImplementedException();
+            cpu.Memory[cpu.Registers[Register.SP]] = cpu.Registers[Register.IP];
+
+            cpu.Registers[Register.SP] += 4;
+
+            cpu.Registers[Register.IP] = Immediate;
+        }
+    }
+
+    public class Ret : UserModeInstruction
+    {
+        public Ret(int instr)
+            : base(instr)
+        {
+        }
+
+        protected override void ExecuteImpl(CPU cpu)
+        {
+            cpu.Registers[Register.SP] -= 4;
+            cpu.Registers[Register.IP] = cpu.Memory[cpu.Registers[Register.SP]];
         }
     }
 
@@ -334,15 +352,6 @@ namespace VirtualMachine.VMInstructions
         protected override void ExecuteImpl(CPU cpu)
         {
             cpu.Registers[_r1] = cpu.Memory[Immediate] & (int)BitMaskHelper.CreateMask(_operandBytes);
-
-            //byte[] bytes = new byte[4];
-
-            //for (int i = 0; i < _operandBytes; i++)
-            //{
-            //    bytes[i] = cpu.Memory[Immediate + i];
-            //}
-
-            //cpu.Registers[_r1] = BitConverter.ToInt32(bytes.Reverse().ToArray(), 0);
         }
     }
 
@@ -356,15 +365,6 @@ namespace VirtualMachine.VMInstructions
         protected override void ExecuteImpl(CPU cpu)
         {
             cpu.Registers[_r1] = cpu.Memory[cpu.Registers[_r2]] & (int)BitMaskHelper.CreateMask(_operandBytes);
-
-            //byte[] bytes = new byte[4];
-
-            //for (int i = 0; i < _operandBytes; i++)
-            //{
-            //    bytes[i] = cpu.Memory[cpu.Registers[_r2] + i];
-            //}
-
-            //cpu.Registers[_r1] = BitConverter.ToInt32(bytes.Reverse().ToArray(), 0);
         }
     }
 
@@ -378,15 +378,6 @@ namespace VirtualMachine.VMInstructions
         protected override void ExecuteImpl(CPU cpu)
         {
             cpu.Registers[_r1] = cpu.Memory[cpu.Registers[_r2] + Immediate] & (int)BitMaskHelper.CreateMask(_operandBytes);
-
-            //byte[] bytes = new byte[4];
-
-            //for (int i = 0; i < _operandBytes; i++)
-            //{
-            //    bytes[i] = cpu.Memory[cpu.Registers[_r2] + Immediate + i];
-            //}
-
-            //cpu.Registers[_r1] = BitConverter.ToInt32(bytes.Reverse().ToArray(), 0);
         }
     }
 
@@ -540,13 +531,6 @@ namespace VirtualMachine.VMInstructions
         protected override void ExecuteImpl(CPU cpu)
         {
             cpu.Memory[cpu.Registers[Register.SP]] = cpu.Registers[_r1];
-
-            //byte[] bytes = BitConverter.GetBytes(cpu.Registers[_r1]).Reverse().ToArray();
-
-            //for (int i = 0; i < 4; i++)
-            //{
-            //    cpu.Memory[cpu.Registers[Register.BP] + i] = bytes[i];
-            //}
 
             cpu.Registers[Register.SP] += 4;
         }

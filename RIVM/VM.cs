@@ -4,10 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using VirtualMachine.IODevices;
-using VirtualMachine.VMInstructions;
+using RIVM.IODevices;
 
-namespace VirtualMachine
+namespace RIVM
 {
     public class VM
     {
@@ -16,7 +15,7 @@ namespace VirtualMachine
         
         public VM()
         {
-            _memory = new MemoryController((int)Math.Pow(2, 30), new BIOS(@"C:\VM\VM.rom"), CreateIODevices()); //1GB RAM 
+            _memory = new MemoryController((int)Math.Pow(2, 30), new BIOS(@"C:\VM\bios.exe"), CreateIODevices()); //1GB RAM 
             _cpu = new CPU(_memory);
         }
 
@@ -28,8 +27,8 @@ namespace VirtualMachine
 
             ioPorts[0] = new IOPort(() => disk.ControlRegister, (val) => disk.ControlRegister = val);
             ioPorts[1] = new IOPort(() => disk.AddressRegister, (val) => disk.AddressRegister = val);
-            ioPorts[1] = new IOPort(() => disk.IOByteCountRegister, (val) => disk.IOByteCountRegister = val);
-            ioPorts[1] = new IOPort(() => disk.DataRegister, (val) => disk.DataRegister = val);
+            ioPorts[2] = new IOPort(() => disk.IOByteCountRegister, (val) => disk.IOByteCountRegister = val);
+            ioPorts[3] = new IOPort(() => disk.DataRegister, (val) => disk.DataRegister = val);
 
             return ioPorts;
         }

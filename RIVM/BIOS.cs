@@ -4,9 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using VirtualMachine.VMInstructions;
 
-namespace VirtualMachine
+namespace RIVM
 {
     public enum BIOSInterruptHandlerAddress
     {
@@ -31,7 +30,14 @@ namespace VirtualMachine
         {
             get
             {
-                return BitConverter.ToInt32(_rom, index);
+                byte[] bytes = new byte[4];
+
+                for (int i = 0; i < 4; i++)
+                {
+                    bytes[i] = _rom[index + i];
+                }
+
+                return BitConverter.ToInt32(bytes.Reverse().ToArray(), 0);
             }
             private set
             {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VirtualMachine
+namespace RIVM
 {
     public static class BitMaskHelper
     {

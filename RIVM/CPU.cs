@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using VirtualMachine.Instructions;
+using RIVM.Instructions;
 
-namespace VirtualMachine
+namespace RIVM
 {
     [Flags]
     public enum CompareFlag
@@ -45,6 +45,7 @@ namespace VirtualMachine
         {
             KernelMode = true;
             Memory.PageTableEnabled = false;
+            Registers[Register.IP] = 8;
             
             while (true)
             {
@@ -90,16 +91,11 @@ namespace VirtualMachine
 
         private int Fetch()
         {
-            return Memory[Registers[Register.IP]++];
+            int instruction = Memory[Registers[Register.IP]];
 
-            //byte[] bytes = new byte[4];
+            Registers[Register.IP] += 4;
 
-            //for (int i = 0; i < 4; i++)
-            //{
-            //    bytes[i] = Memory[Registers[Register.IP]++];
-            //}
-
-            //return BitConverter.ToInt32(bytes.Reverse().ToArray(), 0);
+            return instruction;
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VirtualMachine
+namespace RIVM
 {
     public class MemoryController
     {
@@ -40,7 +40,15 @@ namespace VirtualMachine
                 }
                 else
                 {
-                    return BitConverter.ToInt32(_ram, physicalAddress - SystemMemoryMap.RAM_START);
+                    byte[] bytes = new byte[4];
+
+                    for (int i = 0; i < 4; i++)
+                    {
+                        bytes[i] = _ram[physicalAddress - SystemMemoryMap.RAM_START + i];
+                    }
+
+                    return BitConverter.ToInt32(bytes.Reverse().ToArray(), 0);
+                    //return BitConverter.ToInt32(_ram, physicalAddress - SystemMemoryMap.RAM_START);
                 }
             }
             set

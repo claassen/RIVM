@@ -1,5 +1,5 @@
 
-namespace VirtualMachine.VMInstructions
+namespace RIVM.Instructions
 {
     public enum OpCodes : byte
     {
@@ -7,6 +7,7 @@ namespace VirtualMachine.VMInstructions
         ADDR,
         ANDR,
         CALL,
+        RET,
         CMPI,
         CMPR,
         DIVR,

@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using VirtualMachine;
-using VirtualMachine.Util;
-using VirtualMachine.VMInstructions;
+using RIVM;
+using RIVM.Util;
 
-namespace VirtualMachineCLI
+namespace RIVMCli
 {
     class Program
     {

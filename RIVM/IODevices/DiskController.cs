@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VirtualMachine.IODevices
+namespace RIVM.IODevices
 {
     public class DiskController
     {
