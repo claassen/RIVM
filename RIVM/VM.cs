@@ -11,11 +11,11 @@ namespace RIVM
     public class VM
     {
         private CPU _cpu;
-        private MemoryController _memory;
+        private MMU _memory;
         
         public VM()
         {
-            _memory = new MemoryController((int)Math.Pow(2, 30), new BIOS(@"C:\VM\bios.exe"), CreateIODevices()); //1GB RAM 
+            _memory = new MMU((int)Math.Pow(2, 30), new BIOS(@"C:\VM\bios.exe"), CreateIODevices()); //1GB RAM 
             _cpu = new CPU(_memory);
         }
 

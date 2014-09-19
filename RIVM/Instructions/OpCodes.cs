@@ -39,9 +39,12 @@ namespace RIVM.Instructions
         SUBR,
         XORR,
 
-        SYSENT,
-        SYSEX,
-        //FSREAD,
-        //FSWRITE
+        INT,    //software interrupt
+        IRET,   //return from interrupt
+        CLI,    //disable interrupts
+        STI,    //enable interrupts
+        SETIDT, //set IDT base pointer
+        SETPT,  //set page table base pointer
+        TLBI    //invalidate TLB
     } //max 64 op codes
 }

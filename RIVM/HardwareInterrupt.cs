@@ -10,17 +10,21 @@ namespace RIVM
     {
         SEG_FAULT = 0,
         PROTECTION_FAULT,
-        TLB_MISS,
-        DMA_COMPLETE
+        PAGE_FAULT
     }
 
-    public class HardwareInterruptException : Exception
+    public enum SoftwareInterrupt
     {
-        public HardwareInterrupt Interrupt { get; set; }
+        SYSCALL = 80
+    }
 
-        public HardwareInterruptException(HardwareInterrupt interrupt)
+    public class InterruptException : Exception
+    {
+        public int InterruptNumber { get; set; }
+
+        public InterruptException(int interrupt)
         {
-            Interrupt = interrupt;
+            InterruptNumber = interrupt;
         }
     }
 }

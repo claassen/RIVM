@@ -12,11 +12,10 @@ namespace RIVM
         R1,
         R2,
         R3,
-        SP,
-        BP,
-        IP,
-        IDT,
-        CR
+        SP,    //Stack pointer
+        BP,    //Base pointer
+        IP,    //Instruction pointer
+        CR     //Control register (enable page table)
     }
 
     public class Registers

@@ -43,10 +43,13 @@ namespace RIVM.Instructions
             { OpCodes.SUBR,    (value) => new SubR(value) },
             { OpCodes.XORR,    (value) => new XorR(value) },
 
-            { OpCodes.SYSENT,  (value) => new Sysent(value) },
-            { OpCodes.SYSEX,   (value) => new Sysex(value) },
-            //{ OpCode.FSREAD,  (value) => new FSRead(value) },
-            //{ OpCode.FSWRITE, (value) => new FSWrite(value) }
+            { OpCodes.INT,     (value) => new Int(value) },
+            { OpCodes.IRET,    (value) => new IRet(value) },
+            { OpCodes.CLI,     (value) => new Cli(value) },
+            { OpCodes.STI,     (value) => new Sti(value) },
+            { OpCodes.SETIDT,  (value) => new SetIDT(value) },
+            { OpCodes.SETPT,   (value) => new SetPT(value) },
+            { OpCodes.TLBI,    (value) => new Tlbi(value) }
         };
 
         public static Instruction Decode(int value)
@@ -59,7 +62,7 @@ namespace RIVM.Instructions
             }
             else
             {
-                throw new Exception("Unknown OPCODE: " + opCode.ToString());
+                throw new Exception("Unknown opcode: " + opCode.ToString());
             }
         }
     }
