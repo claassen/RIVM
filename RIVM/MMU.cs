@@ -3,23 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using RIVM.IODevices;
 
 namespace RIVM
 {
     public class MMU
     {
+        public int MemoryAccessSize = 4;
         public bool PTEnabled;
         public int PTPointer;
 
         private byte[] _ram;
         private IOPort[] _ioPorts;
+        private VideoCard _videoCard;
         private BIOS _bios;
         private TLB _tlb;
        
-        public MMU(int size, BIOS bios, IOPort[] ioPorts)
+        public MMU(int size, BIOS bios, IOPort[] ioPorts, VideoCard videoCard)
         {
             _bios = bios;
             _ioPorts = ioPorts;
+            _videoCard = videoCard;
             _ram = new byte[size];
             
             _tlb = new TLB();
@@ -36,45 +40,53 @@ namespace RIVM
             {
                 int physicalAddress = GetPhysicalAddress(address);
 
-                if (physicalAddress <= SystemMemoryMap.BIOS_ROM_END)
+                if (physicalAddress >= SystemMemoryMap.IO_PORT_START && physicalAddress <= SystemMemoryMap.IO_PORT_END)
+                {
+                    //IO Ports
+                    return _ioPorts[(physicalAddress - SystemMemoryMap.IO_PORT_START) / 4].Register;
+                }
+                else if(physicalAddress >= SystemMemoryMap.VGA_MEMORY_START && physicalAddress <= SystemMemoryMap.VGA_MEMORY_END)
+                {
+                    //VGA memory
+                    throw new InterruptException((int)HardwareInterrupt.PROTECTION_FAULT);
+                }
+                else if(physicalAddress >= SystemMemoryMap.BIOS_ROM_START && physicalAddress <= SystemMemoryMap.BIOS_ROM_END)
                 {
                     return _bios[physicalAddress - SystemMemoryMap.BIOS_ROM_START];
                 }
-                else if (physicalAddress <= SystemMemoryMap.IO_PORT_END)
-                {
-                    return _ioPorts[physicalAddress - SystemMemoryMap.IO_PORT_START].Register;
-                }
-                else
-                {
-                    byte[] bytes = new byte[4];
+                
+                byte[] bytes = new byte[4];
 
-                    for (int i = 0; i < 4; i++)
-                    {
-                        bytes[i] = _ram[physicalAddress - SystemMemoryMap.RAM_START + i];
-                    }
-
-                    return BitConverter.ToInt32(bytes.Reverse().ToArray(), 0);
+                for (int i = 0; i < MemoryAccessSize; i++)
+                {
+                    bytes[i] = _ram[physicalAddress + i];
                 }
+
+                return BitConverter.ToInt32(bytes.Reverse().ToArray(), 0);
             }
             set
             {
                 int physicalAddress = GetPhysicalAddress(address);
 
-                if (physicalAddress <= SystemMemoryMap.BIOS_ROM_END)
+                if (physicalAddress >= SystemMemoryMap.IO_PORT_START && physicalAddress <= SystemMemoryMap.IO_PORT_END)
+                {
+                    _ioPorts[(physicalAddress - SystemMemoryMap.IO_PORT_START) / 4].Register = value;
+                }
+                else if (physicalAddress >= SystemMemoryMap.VGA_MEMORY_START && physicalAddress <= SystemMemoryMap.VGA_MEMORY_END)
+                {
+                    _videoCard[physicalAddress - SystemMemoryMap.VGA_MEMORY_START] = (byte)value; //TODO: fix this
+                }
+                else if (physicalAddress >= SystemMemoryMap.BIOS_ROM_START && physicalAddress <= SystemMemoryMap.BIOS_ROM_END)
                 {
                     throw new InterruptException((int)HardwareInterrupt.PROTECTION_FAULT);
                 }
-                else if (physicalAddress <= SystemMemoryMap.IO_PORT_END)
-                {
-                    _ioPorts[physicalAddress - SystemMemoryMap.IO_PORT_START].Register = value;
-                }
                 else
                 {
-                    byte[] val = BitConverter.GetBytes(value).Reverse().ToArray();
+                    byte[] val = BitConverter.GetBytes(value); //.Reverse().ToArray();
 
-                    for (int i = 0; i < 4; i++)
+                    for (int i = 0; i < MemoryAccessSize; i++)
                     {
-                        _ram[physicalAddress - SystemMemoryMap.RAM_START + i] = val[i];
+                        _ram[physicalAddress + MemoryAccessSize - (i + 1)] = val[i];
                     }
                 }
             }

@@ -8,7 +8,6 @@ namespace RIVM
 {
     public enum HardwareInterrupt
     {
-        SEG_FAULT = 0,
         PROTECTION_FAULT,
         PAGE_FAULT
     }

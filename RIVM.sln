@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RIVMCli", "RIVMCli\RIVMCli.csproj", "{48C0682F-9F2D-4D2B-BFDA-B468C8EA1698}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RIVM", "RIVM\RIVM.csproj", "{65C2EAE6-D193-4919-B024-E8D41821F23A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RIVMApp", "RIVMApp\RIVMApp.csproj", "{48C0682F-9F2D-4D2B-BFDA-B468C8EA1698}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RIVMCli", "RIVMCli\RIVMCli.csproj", "{5189AA62-AD35-410F-9F17-1451ABD5D5CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,16 +13,23 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{48C0682F-9F2D-4D2B-BFDA-B468C8EA1698}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{48C0682F-9F2D-4D2B-BFDA-B468C8EA1698}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{48C0682F-9F2D-4D2B-BFDA-B468C8EA1698}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{48C0682F-9F2D-4D2B-BFDA-B468C8EA1698}.Release|Any CPU.Build.0 = Release|Any CPU
 		{65C2EAE6-D193-4919-B024-E8D41821F23A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{65C2EAE6-D193-4919-B024-E8D41821F23A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{65C2EAE6-D193-4919-B024-E8D41821F23A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{65C2EAE6-D193-4919-B024-E8D41821F23A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48C0682F-9F2D-4D2B-BFDA-B468C8EA1698}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48C0682F-9F2D-4D2B-BFDA-B468C8EA1698}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48C0682F-9F2D-4D2B-BFDA-B468C8EA1698}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48C0682F-9F2D-4D2B-BFDA-B468C8EA1698}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5189AA62-AD35-410F-9F17-1451ABD5D5CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5189AA62-AD35-410F-9F17-1451ABD5D5CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5189AA62-AD35-410F-9F17-1451ABD5D5CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5189AA62-AD35-410F-9F17-1451ABD5D5CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

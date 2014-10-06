@@ -4,15 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{65C2EAE6-D193-4919-B024-E8D41821F23A}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{48C0682F-9F2D-4D2B-BFDA-B468C8EA1698}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RIVM</RootNamespace>
-    <AssemblyName>RIVM</AssemblyName>
+    <RootNamespace>RIVMApp</RootNamespace>
+    <AssemblyName>RIVMApp</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,12 +23,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -41,23 +46,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BIOS.cs" />
-    <Compile Include="BitHelper.cs" />
-    <Compile Include="Constants.cs" />
-    <Compile Include="CPU.cs" />
-    <Compile Include="IODevices\DiskController.cs" />
-    <Compile Include="Instructions\OpCodes.cs" />
-    <Compile Include="IODevices\VideoCard.cs" />
-    <Compile Include="IOPort.cs" />
-    <Compile Include="Util\DiskFormatter.cs" />
-    <Compile Include="HardwareInterrupt.cs" />
-    <Compile Include="Instructions\Instruction.cs" />
-    <Compile Include="Instructions\InstructionDecoder.cs" />
-    <Compile Include="MMU.cs" />
+    <Compile Include="MainDisplay.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainDisplay.Designer.cs">
+      <DependentUpon>MainDisplay.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Registers.cs" />
-    <Compile Include="TLB.cs" />
-    <Compile Include="VM.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RIVM\RIVM.csproj">
+      <Project>{65c2eae6-d193-4919-b024-e8d41821f23a}</Project>
+      <Name>RIVM</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

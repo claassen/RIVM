@@ -6,18 +6,21 @@ using System.Threading.Tasks;
 
 namespace RIVM
 {
-    public static class BitMaskHelper
+    public static class BitHelper
     {
-        public static uint CreateMask(int numBytes)
+        public static int ExtractBytes(int val, int numBytes)
+        {
+            return (val & (int)CreateMemoryMask(numBytes)) >> ((4 - numBytes) * 8);
+        }
+
+        private static uint CreateMemoryMask(int numBytes)
         {
             switch (numBytes)
             {
                 case 1:
-                    return 0x000000FF;
+                    return 0xFF000000;
                 case 2:
-                    return 0x0000FFFF;
-                case 3:
-                    return 0x00FFFFFF;
+                    return 0xFFFF0000;
                 case 4:
                     return 0xFFFFFFFF;
                 default:

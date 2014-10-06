@@ -20,11 +20,19 @@ namespace RIVM
 
     public static class SystemMemoryMap
     {
-        public static readonly int BIOS_ROM_START = 0;
-        public static readonly int BIOS_ROM_END = 1023;
-        public static readonly int IO_PORT_START = 1024;
-        public static readonly int IO_PORT_END = 2047;
-        public static readonly int RAM_START = 2048;
+        public static readonly int IVT_START         = 0x00000000;
+        public static readonly int IVT_END           = 0x000003FF;
+        public static readonly int IO_PORT_START     = 0x00000400;
+        public static readonly int IO_PORT_END       = 0x000004FF;
+        public static readonly int BIOS_STACK_START  = 0x00000500;
+        public static readonly int BIOS_STACK_END    = 0x00007BFF;
+        public static readonly int BOOT_SECTOR_START = 0x00007C00;
+        public static readonly int BOOT_SECTOR_END   = 0x00007DFF;
+        public static readonly int VGA_MEMORY_START  = 0x000A0000;
+        public static readonly int VGA_MEMORY_END    = 0x000BFFFF;
+        public static readonly int BIOS_ROM_START    = 0x000F0000;
+        public static readonly int BIOS_ROM_END      = 0x000FFFFF;
+        public static readonly int RAM_START         = 0x00100000;
     }
 
     public class CPU
@@ -38,6 +46,8 @@ namespace RIVM
         public bool InterruptsEnabled;
 
         public int IDTPointer;
+
+        public int MemoryAccessSize { set { Memory.MemoryAccessSize = value; } }
         
         public CPU(MMU memory)
         {
@@ -50,7 +60,7 @@ namespace RIVM
         {
             KernelMode = true;
             Memory.PTEnabled = false;
-            Registers[Register.IP] = 8;
+            Registers[Register.IP] = SystemMemoryMap.BIOS_ROM_START;
             
             while (true)
             {
@@ -65,6 +75,8 @@ namespace RIVM
                         {
                             instruction.Immediate = Fetch();
                         }
+
+                        //Console.WriteLine(instruction);
 
                         instruction.Execute(this);
                     }

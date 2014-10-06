@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,15 +12,16 @@ namespace RIVM
     public class VM
     {
         private CPU _cpu;
-        private MMU _memory;
+        private VideoCard _video;
         
-        public VM()
+        public VM(int memorySize, string biosExe, string diskFile, Graphics graphics)
         {
-            _memory = new MMU((int)Math.Pow(2, 30), new BIOS(@"C:\VM\bios.exe"), CreateIODevices()); //1GB RAM 
-            _cpu = new CPU(_memory);
+            _video = new VideoCard(graphics);
+
+            _cpu = new CPU(new MMU(memorySize, new BIOS(biosExe), CreateIODevices(diskFile), _video));
         }
 
-        private IOPort[] CreateIODevices()
+        private IOPort[] CreateIODevices(string diskFile)
         {
             IOPort[] ioPorts = new IOPort[SystemMemoryMap.IO_PORT_END - SystemMemoryMap.IO_PORT_START + 1];
 
@@ -38,23 +40,9 @@ namespace RIVM
             _cpu.Start();
         }
 
-        public void RunProgram(string path)
+        public void ResizeDisplay(Graphics newGraphics)
         {
-            using (var fs = new BinaryReader(new FileStream(path, FileMode.Open)))
-            {
-                int entryAddress = fs.ReadInt32();
-
-                for (int i = 0; i < fs.BaseStream.Length - 8; i++)
-                {
-                    _memory[i] = fs.ReadByte();
-                }
-
-                _cpu.Registers[Register.IP] = entryAddress;
-                _cpu.KernelMode = false;
-                _cpu.Registers[Register.BP] = (int)fs.BaseStream.Length;
-                _cpu.Registers[Register.SP] = (int)fs.BaseStream.Length;
-                _cpu.Start();
-            }
+            _video.ResizeDisplay(newGraphics);
         }
     }
 }

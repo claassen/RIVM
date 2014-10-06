@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{48C0682F-9F2D-4D2B-BFDA-B468C8EA1698}</ProjectGuid>
+    <ProjectGuid>{5189AA62-AD35-410F-9F17-1451ABD5D5CC}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RIVMCli</RootNamespace>
