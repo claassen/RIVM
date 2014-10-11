@@ -25,7 +25,7 @@ namespace RIVM
         {
             IOPort[] ioPorts = new IOPort[SystemMemoryMap.IO_PORT_END - SystemMemoryMap.IO_PORT_START + 1];
 
-            var disk = new DiskController(@"C:\VM\VM.disk");
+            var disk = new DiskController(@"C:\VM\vm.disk");
 
             ioPorts[0] = new IOPort(() => disk.ControlRegister, (val) => disk.ControlRegister = val);
             ioPorts[1] = new IOPort(() => disk.AddressRegister, (val) => disk.AddressRegister = val);

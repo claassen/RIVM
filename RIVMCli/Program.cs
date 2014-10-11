@@ -11,7 +11,7 @@ namespace RIVMCli
     {
         static void Main(string[] args)
         {
-            DiskFormatter.Format(@"C:\VM\VM.disk", @"C:\VM\bootloader.exe");
+            DiskFormatter.Format(@"C:\VM\vm.disk", @"C:\VM\bootloader.exe", @"C:\VM\kernel.exe");
         }
     }
 }

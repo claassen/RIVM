@@ -13,7 +13,7 @@ namespace RIVM
     {
         LT = 1,
         EQ = 2,
-        GT = 3,
+        GT = 4,
         LE = LT | EQ,
         GE = GT | EQ
     }
