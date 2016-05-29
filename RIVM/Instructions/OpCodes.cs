@@ -45,6 +45,8 @@ namespace RIVM.Instructions
         STI,    //enable interrupts
         SETIDT, //set IDT base pointer
         SETPT,  //set page table base pointer
-        TLBI    //invalidate TLB
+        TLBI,   //invalidate TLB
+
+        BRK     //Debug break
     } //max 64 op codes
 }

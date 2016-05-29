@@ -51,6 +51,17 @@ namespace RIVM.IODevices
 
         public byte this[int address]
         {
+            get
+            {
+                if (address < _videoMemory.Length)
+                {
+                    return _videoMemory[address];
+                }
+                else
+                {
+                    return 0;
+                }
+            }
             set
             {
                 _videoMemory[address] = value;

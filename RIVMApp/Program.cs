@@ -14,6 +14,8 @@ namespace RIVMApp
         [STAThread]
         static void Main(string[] args)
         {
+            DiskFormatter.Format(@"C:\VM\vm.disk", @"C:\VM\bootloader.exe", @"C:\VM\kernel.exe");
+
             Application.Run(new MainDisplay());
         }
     }

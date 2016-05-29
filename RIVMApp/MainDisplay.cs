@@ -21,6 +21,10 @@ namespace RIVMApp
             InitializeComponent();
 
             Init();
+
+            var debugger = new Debugger(_vm);
+
+            debugger.Show();
         }
 
         private void Init()
@@ -28,7 +32,7 @@ namespace RIVMApp
             this.Width = 800;
             this.Height = 600;
 
-            _vm = new VM((int)Math.Pow(2, 30), @"C:\VM\bios.exe", @"C:\VM\VM.disk", this.CreateGraphics());
+            _vm = new VM((int)Math.Pow(2, 29), @"C:\VM\bios.exe", @"C:\VM\VM.disk", this.CreateGraphics());
 
             new Thread(() => { _vm.Start(); }).Start();
 

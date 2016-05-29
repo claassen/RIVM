@@ -11,21 +11,21 @@ namespace RIVM
 {
     public class VM
     {
-        private CPU _cpu;
+        public CPU cpu;
         private VideoCard _video;
         
         public VM(int memorySize, string biosExe, string diskFile, Graphics graphics)
         {
             _video = new VideoCard(graphics);
 
-            _cpu = new CPU(new MMU(memorySize, new BIOS(biosExe), CreateIODevices(diskFile), _video));
+            cpu = new CPU(new MMU(memorySize, new BIOS(biosExe), CreateIODevices(diskFile), _video));
         }
 
         private IOPort[] CreateIODevices(string diskFile)
         {
             IOPort[] ioPorts = new IOPort[SystemMemoryMap.IO_PORT_END - SystemMemoryMap.IO_PORT_START + 1];
 
-            var disk = new DiskController(@"C:\VM\vm.disk");
+            var disk = new DiskController(diskFile);
 
             ioPorts[0] = new IOPort(() => disk.ControlRegister, (val) => disk.ControlRegister = val);
             ioPorts[1] = new IOPort(() => disk.AddressRegister, (val) => disk.AddressRegister = val);
@@ -37,7 +37,21 @@ namespace RIVM
 
         public void Start()
         {
-            _cpu.Start();
+            cpu.Start();
+        }
+
+        public void Step()
+        {
+            cpu.Step();
+        }
+
+        public void Continue()
+        {
+            cpu.Continue();
+        }
+
+        public void RegisterStepNotification(Action handler) {
+            cpu.RegisterStepNotification(handler);
         }
 
         public void ResizeDisplay(Graphics newGraphics)

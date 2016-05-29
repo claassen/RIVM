@@ -48,7 +48,12 @@ namespace RIVM.Instructions
 
             cpu.MemoryAccessSize = _memoryAccessSize;
 
-            ExecuteImpl(cpu);
+            ExecuteImpl(cpu);       
+        }
+
+        public override string ToString()
+        {
+            return _opCode.ToString() + " " + _r1.ToString() + " " + _r2.ToString() + " " + _r3.ToString() + " " + (HasImmediate ? "Immediate: " + Immediate : "") + "[" + _memoryAccessSize + "]";
         }
 
         protected abstract bool KernelModeOnly { get; }
@@ -154,7 +159,6 @@ namespace RIVM.Instructions
 
         protected override void ExecuteImpl(CPU cpu)
         {
-            //cpu.Registers[Register.SP] -= 4;
             cpu.Registers[Register.IP] = cpu.Memory[cpu.Registers[Register.SP]];
         }
 
@@ -373,7 +377,7 @@ namespace RIVM.Instructions
 
         protected override void ExecuteImpl(CPU cpu)
         {
-            cpu.Registers[_r1] = BitHelper.ExtractBytes(cpu.Memory[Immediate], _memoryAccessSize); // &(int)BitMaskHelper.CreateMask(_memoryAccessSize);
+            cpu.Registers[_r1] = BitHelper.ExtractBytes(cpu.Memory[Immediate], _memoryAccessSize);
         }
     }
 
@@ -387,7 +391,7 @@ namespace RIVM.Instructions
         protected override void ExecuteImpl(CPU cpu)
         {
             int val4 = cpu.Memory[cpu.Registers[_r2]];
-            int val = BitHelper.ExtractBytes(val4, _memoryAccessSize); // &(int)BitMaskHelper.CreateMask(_memoryAccessSize);
+            int val = BitHelper.ExtractBytes(val4, _memoryAccessSize);
 
             cpu.Registers[_r1] = val;
         }
@@ -402,7 +406,7 @@ namespace RIVM.Instructions
 
         protected override void ExecuteImpl(CPU cpu)
         {
-            cpu.Registers[_r1] = BitHelper.ExtractBytes(cpu.Memory[cpu.Registers[_r2] + Immediate], _memoryAccessSize); // &(int)BitMaskHelper.CreateMask(_memoryAccessSize);
+            cpu.Registers[_r1] = BitHelper.ExtractBytes(cpu.Memory[cpu.Registers[_r2] + Immediate], _memoryAccessSize);
         }
     }
 
@@ -580,7 +584,7 @@ namespace RIVM.Instructions
 
         protected override void ExecuteImpl(CPU cpu)
         {
-            cpu.Memory[Immediate] = cpu.Registers[_r1]; // &(int)BitMaskHelper.CreateMask(_memoryAccessSize);
+            cpu.Memory[Immediate] = cpu.Registers[_r1];
         }
     }
 
@@ -593,7 +597,7 @@ namespace RIVM.Instructions
 
         protected override void ExecuteImpl(CPU cpu)
         {
-            cpu.Memory[cpu.Registers[_r1]] = cpu.Registers[_r2]; // &(int)BitMaskHelper.CreateMask(_memoryAccessSize);
+            cpu.Memory[cpu.Registers[_r1]] = cpu.Registers[_r2];
         }
     }
 
@@ -606,8 +610,6 @@ namespace RIVM.Instructions
 
         protected override void ExecuteImpl(CPU cpu)
         {
-            //int val = BitMaskHelper.ExtractBytes(cpu.Registers[_r2], _memoryAccessSize); // &(int)BitMaskHelper.CreateMask(_memoryAccessSize);
-
             cpu.Memory[cpu.Registers[_r1] + Immediate] = cpu.Registers[_r2];
         }
     }
@@ -647,7 +649,7 @@ namespace RIVM.Instructions
 
         protected override void ExecuteImpl(CPU cpu)
         {
-            throw new InterruptException(Immediate);
+            cpu.RaiseInterrupt(Immediate);
         }
     }
 
@@ -726,6 +728,19 @@ namespace RIVM.Instructions
         protected override void ExecuteImpl(CPU cpu)
         {
             cpu.Memory.InvalidateTLB();
+        }
+    }
+
+    public class Break : UserModeInstruction
+    {
+        public Break(int value)
+            : base(value)
+        {
+        }
+
+        protected override void ExecuteImpl(CPU cpu)
+        {
+            ;
         }
     }
 }

@@ -29,6 +29,14 @@ namespace RIVM
             _tlb = new TLB();
         }
 
+        //public IEnumerable<int> GetMemoryForDebugging(int start, int end)
+        //{
+        //    for (int i = start; i < end /*(SystemMemoryMap.RAM_START + _ram.Length / 4) / 4*/; i += 4)
+        //    {
+        //        yield return Get(i, false);
+        //    }
+        //}
+
         public void InvalidateTLB()
         {
             _tlb.Invalidate();
@@ -38,35 +46,16 @@ namespace RIVM
         {
             get
             {
-                int physicalAddress = GetPhysicalAddress(address);
-
-                if (physicalAddress >= SystemMemoryMap.IO_PORT_START && physicalAddress <= SystemMemoryMap.IO_PORT_END)
-                {
-                    //IO Ports
-                    return _ioPorts[(physicalAddress - SystemMemoryMap.IO_PORT_START) / 4].Register;
-                }
-                else if(physicalAddress >= SystemMemoryMap.VGA_MEMORY_START && physicalAddress <= SystemMemoryMap.VGA_MEMORY_END)
-                {
-                    //VGA memory
-                    throw new InterruptException((int)HardwareInterrupt.PROTECTION_FAULT);
-                }
-                else if(physicalAddress >= SystemMemoryMap.BIOS_ROM_START && physicalAddress <= SystemMemoryMap.BIOS_ROM_END)
-                {
-                    return _bios[physicalAddress - SystemMemoryMap.BIOS_ROM_START];
-                }
-                
-                byte[] bytes = new byte[4];
-
-                for (int i = 0; i < MemoryAccessSize; i++)
-                {
-                    bytes[i] = _ram[physicalAddress + i];
-                }
-
-                return BitConverter.ToInt32(bytes.Reverse().ToArray(), 0);
+                return Get(address, true);
             }
             set
             {
                 int physicalAddress = GetPhysicalAddress(address);
+
+                if (physicalAddress == 15)
+                {
+                    throw new Exception("wtf");
+                }
 
                 if (physicalAddress >= SystemMemoryMap.IO_PORT_START && physicalAddress <= SystemMemoryMap.IO_PORT_END)
                 {
@@ -82,7 +71,7 @@ namespace RIVM
                 }
                 else
                 {
-                    byte[] val = BitConverter.GetBytes(value); //.Reverse().ToArray();
+                    byte[] val = BitConverter.GetBytes(value);
 
                     for (int i = 0; i < MemoryAccessSize; i++)
                     {
@@ -90,6 +79,44 @@ namespace RIVM
                     }
                 }
             }
+        }
+
+        public int Get(int address, bool enforceProtection)
+        {
+            int physicalAddress = GetPhysicalAddress(address);
+
+            if (physicalAddress >= SystemMemoryMap.IO_PORT_START && physicalAddress <= SystemMemoryMap.IO_PORT_END)
+            {
+                //IO Ports
+                IOPort ioPort = _ioPorts[(physicalAddress - SystemMemoryMap.IO_PORT_START) / 4]; 
+
+                return ioPort != null ? ioPort.Register : 0;
+            }
+            else if (physicalAddress >= SystemMemoryMap.VGA_MEMORY_START && physicalAddress <= SystemMemoryMap.VGA_MEMORY_END)
+            {
+                //VGA memory
+                if (enforceProtection)
+                {
+                    throw new InterruptException((int)HardwareInterrupt.PROTECTION_FAULT);
+                }
+                else
+                {
+                    return _videoCard[physicalAddress - SystemMemoryMap.VGA_MEMORY_START];
+                }
+            }
+            else if (physicalAddress >= SystemMemoryMap.BIOS_ROM_START && physicalAddress <= SystemMemoryMap.BIOS_ROM_END)
+            {
+                return _bios[physicalAddress - SystemMemoryMap.BIOS_ROM_START];
+            }
+
+            byte[] bytes = new byte[4];
+
+            for (int i = 0; i < MemoryAccessSize; i++)
+            {
+                bytes[i] = _ram[physicalAddress + i];
+            }
+
+            return BitConverter.ToInt32(bytes.Reverse().ToArray(), 0);
         }
 
         private int GetPhysicalAddress(int address)

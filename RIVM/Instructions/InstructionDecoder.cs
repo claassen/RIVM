@@ -49,7 +49,9 @@ namespace RIVM.Instructions
             { OpCodes.STI,     (value) => new Sti(value) },
             { OpCodes.SETIDT,  (value) => new SetIDT(value) },
             { OpCodes.SETPT,   (value) => new SetPT(value) },
-            { OpCodes.TLBI,    (value) => new Tlbi(value) }
+            { OpCodes.TLBI,    (value) => new Tlbi(value) },
+
+            { OpCodes.BRK,     (value) => new Break(value) }
         };
 
         public static Instruction Decode(int value)
@@ -62,6 +64,8 @@ namespace RIVM.Instructions
             }
             else
             {
+                return new Halt(0);
+
                 throw new Exception("Unknown opcode: " + opCode.ToString());
             }
         }
