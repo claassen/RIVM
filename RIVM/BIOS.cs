@@ -14,39 +14,46 @@ namespace RIVM
 
     public class BIOS
     {
+        public const int MAX_ROM_SIZE = SystemMemoryMap.BIOS_ROM_END - SystemMemoryMap.BIOS_ROM_START + 1; 
+
         private byte[] _rom;
 
         public BIOS(string romFile)
         {
-            _rom = new byte[SystemMemoryMap.BIOS_ROM_END - SystemMemoryMap.BIOS_ROM_START + 1];
+            _rom = new byte[MAX_ROM_SIZE];
 
             using (var fs = new FileStream(romFile, FileMode.Open))
             {
+                if (fs.Length > MAX_ROM_SIZE)
+                {
+                    throw new Exception("Provided BIOS code is too large. Max ROM size is " + MAX_ROM_SIZE + "bytes and the provided object code is " + fs.Length + " bytes.");
+                }
+
                 fs.Read(_rom, 0, _rom.Length);
             }
         }
 
-        public int this[int index]
+        public BIOS(byte[] objectCode)
+        {
+            if (objectCode.Length > MAX_ROM_SIZE)
+            {
+                throw new Exception("Provided BIOS code is too large. Max ROM size is " + MAX_ROM_SIZE + "bytes and the provided object code is " + objectCode.Length + " bytes.");
+            }
+
+            _rom = new byte[MAX_ROM_SIZE];
+
+            Buffer.BlockCopy(objectCode, 0, _rom, 0, objectCode.Length);
+        }
+
+        public byte this[int index]
         {
             get
             {
-                byte[] bytes = new byte[4];
-
-                for (int i = 0; i < 4; i++)
-                {
-                    bytes[i] = _rom[index + i];
-                }
-
-                return BitConverter.ToInt32(bytes.Reverse().ToArray(), 0);
+                return _rom[index];
             }
             private set
             {
-                byte[] val = BitConverter.GetBytes(value).Reverse().ToArray();
-
-                for (int i = 0; i < 4; i++)
-                {
-                    _rom[index + i] = val[i];
-                }
+                _rom[index] = value;
             }
         }
     }

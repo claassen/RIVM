@@ -25,6 +25,8 @@ namespace RIVMApp
             var debugger = new Debugger(_vm);
 
             debugger.Show();
+
+            new Thread(() => { _vm.Start(); }).Start();
         }
 
         private void Init()
@@ -33,8 +35,6 @@ namespace RIVMApp
             this.Height = 600;
 
             _vm = new VM((int)Math.Pow(2, 29), @"C:\VM\bios.exe", @"C:\VM\VM.disk", this.CreateGraphics());
-
-            new Thread(() => { _vm.Start(); }).Start();
 
             this.SizeChanged += MainDisplay_SizeChanged;
             this.FormClosed += MainDisplay_FormClosed;

@@ -32,9 +32,14 @@ namespace RIVM.Util
                 fs.Read(kernelImage, 0, (int)fs.BaseStream.Length);
             }
 
-            using (var fs = new BinaryWriter(new FileStream(diskFile, FileMode.Open, FileAccess.Write)))
+            using (var fs = new FileStream(diskFile, FileMode.OpenOrCreate, FileAccess.Write))
+            using (var bw = new BinaryWriter(fs))
             {
-                int size = (int)fs.BaseStream.Length;
+                long diskSize = 1024L * 1024L * 1024L;
+
+                fs.SetLength(diskSize);
+
+                int size = (int)bw.BaseStream.Length;
 
                 //MBR
                 using (var fs2 = new BinaryReader(new FileStream(bootLoaderExeFile, FileMode.Open)))
@@ -43,52 +48,53 @@ namespace RIVM.Util
 
                     fs2.Read(bootLoader, 0, (int)Math.Min(512, fs2.BaseStream.Length));
 
-                    fs.Write(bootLoader);
+                    bw.Write(bootLoader);
                 }
 
-                fs.Seek(512, SeekOrigin.Begin);
+                bw.Seek(512, SeekOrigin.Begin);
 
                 int numSectors = size / 512;
-                int dataStart = 512                     //MBR size
+                int dataStart = 524                     //MBR size
                               + numSectors * 4          //FAT table size  
                               + maxFiles * (8 + 4 + 4); //root directory size
 
                 //Header
-                fs.Write(numSectors);
-                fs.Write(maxFiles);
-                fs.Write(dataStart);
+                bw.Write(BitConverter.ToInt32(BitConverter.GetBytes(numSectors).Reverse().ToArray(), 0));
+                bw.Write(BitConverter.ToInt32(BitConverter.GetBytes(maxFiles).Reverse().ToArray(), 0));
+                bw.Write(BitConverter.ToInt32(BitConverter.GetBytes(dataStart).Reverse().ToArray(), 0));
 
                 int numKernelImageSectors = (int)Math.Ceiling(kernelImage.Length / 512.0);
                 
                 for (int i = 0; i < numKernelImageSectors; i++)
                 {
-                    fs.Write(i + 1);    
+                    bw.Write(BitConverter.ToInt32(BitConverter.GetBytes(i + 1).Reverse().ToArray(), 0));    
                 }
 
                 //FAT table
                 for (int i = numKernelImageSectors; i < numSectors; i++)
                 {
-                    fs.Write(0);
+                    bw.Write(0);
                 }
 
                 //Root directory
                 foreach (char c in "ker.sys".ToCharArray())
                 {
-                    fs.Write((byte)c);
+                    bw.Write((byte)c);
                 }
-                fs.Write(0);
+                bw.Write((byte)0); //8th byte of file name
 
-                fs.Write(0);
-                fs.Write(kernelImage.Length);
+                bw.Write((int)0); //Start sector
+
+                bw.Write(kernelImage.Length);
                 
                 for (int i = 1; i < maxFiles; i++)
                 {
-                    fs.Write(0L); //Filename
-                    fs.Write(0);  //Start sector
-                    fs.Write(0);  //File size
+                    bw.Write(0L); //Filename
+                    bw.Write(0);  //Start sector
+                    bw.Write(0);  //File size
                 }
 
-                fs.Write(kernelImage);
+                bw.Write(kernelImage);
             }
         }
     }

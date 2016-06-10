@@ -54,8 +54,25 @@ namespace RIVMApp
         {
             txtCurrentInstruction.Invoke((MethodInvoker)(() =>
             {
-                txtCurrentInstruction.Text = _vm.cpu.GetCurrentInstruction();
+                txtCurrentInstruction.Text = getNextInstruction().ToString();
             }));
+        }
+
+        private Instruction getNextInstruction()
+        {
+            int address = _vm.cpu.Registers[Register.IP];
+
+            int machineCode = _vm.cpu.Memory.Get(address, false, 4);
+            address += 4;
+
+            Instruction instruction = InstructionDecoder.Decode(machineCode);
+
+            if (instruction.HasImmediate)
+            {
+                instruction.Immediate = _vm.cpu.Memory.Get(address, false, 4);
+            }
+
+            return instruction;
         }
 
         private void updateMemoryDisplay()
@@ -65,13 +82,13 @@ namespace RIVMApp
             dt.Columns.Add(new DataColumn("address", typeof(string)));
             dt.Columns.Add(new DataColumn("value", typeof(string)));
             dt.Columns.Add(new DataColumn("instruction", typeof(String)));
- 
+
             int start = _vm.cpu.Registers[Register.IP];
             int end = start + 40;
 
             for (int address = start; address < end;)
             {
-                int machineCode = _vm.cpu.Memory.Get(address, false);
+                int machineCode = _vm.cpu.Memory.Get(address, false, 4);
 
                 object[] firstRowData = new object[3];
                 firstRowData[0] = address;
@@ -83,7 +100,7 @@ namespace RIVMApp
 
                 if (instruction.HasImmediate)
                 {
-                    instruction.Immediate = _vm.cpu.Memory.Get(address, false);
+                    instruction.Immediate = _vm.cpu.Memory.Get(address, false, 4);
                     address += 4;
                 }
 
@@ -92,7 +109,7 @@ namespace RIVMApp
 
                 if (instruction.HasImmediate)
                 {
-                    dt.Rows.Add(address, instruction.Immediate, "[immediate value]");
+                    dt.Rows.Add(address - 4, instruction.Immediate, "[immediate value]");
                 }
             }
 
@@ -106,18 +123,32 @@ namespace RIVMApp
         {
             DataTable dt = new DataTable();
 
+            dt.Columns.Add(new DataColumn("info", typeof(string)));
             dt.Columns.Add(new DataColumn("address", typeof(string)));
             dt.Columns.Add(new DataColumn("value", typeof(string)));
 
-            int start = _vm.cpu.Registers[Register.BP];
-            int end = _vm.cpu.Registers[Register.SP];
+            int start = _vm.cpu.Registers[Register.BP] - 20;
+            int end = _vm.cpu.Registers[Register.SP] + 20;
 
             for (int address = start; address < end;)
             {
-                int value = _vm.cpu.Memory.Get(address, false);
-                address += 4;
+                int value = _vm.cpu.Memory.Get(address, false, 4);
 
-                dt.Rows.Add(address, value);
+                string info = "";
+
+                if(address == _vm.cpu.Registers[Register.BP])
+                {
+                    info += "bp";
+                }
+
+                if(address == _vm.cpu.Registers[Register.SP])
+                {
+                    info += "sp";
+                }
+                
+                dt.Rows.Add(info, address, value);
+
+                address += 4;
             }
 
             stackGridView.Invoke((MethodInvoker)(() =>

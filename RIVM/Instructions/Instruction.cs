@@ -53,8 +53,10 @@ namespace RIVM.Instructions
 
         public override string ToString()
         {
-            return _opCode.ToString() + " " + _r1.ToString() + " " + _r2.ToString() + " " + _r3.ToString() + " " + (HasImmediate ? "Immediate: " + Immediate : "") + "[" + _memoryAccessSize + "]";
+            return _toString() + " [" + _memoryAccessSize + "]";
         }
+
+        protected abstract string _toString();
 
         protected abstract bool KernelModeOnly { get; }
         protected abstract void ExecuteImpl(CPU cpu);
@@ -104,7 +106,7 @@ namespace RIVM.Instructions
             cpu.Registers[_r1] = cpu.Registers[_r2] + cpu.Registers[_r3];
         }
 
-        public override string ToString()
+        protected override string _toString()
         {
             return String.Format("add {0}, {1} -> {2}", _r2, _r3, _r1);
         }
@@ -122,7 +124,7 @@ namespace RIVM.Instructions
             cpu.Registers[_r1] = cpu.Registers[_r2] & cpu.Registers[_r3];
         }
 
-        public override string ToString()
+        protected override string _toString()
         {
             return String.Format("and {0}, {1} -> {2}", _r2, _r3, _r1);
         }
@@ -144,7 +146,7 @@ namespace RIVM.Instructions
             cpu.Registers[Register.IP] = Immediate;
         }
 
-        public override string ToString()
+        protected override string _toString()
         {
             return String.Format("call {0}", Immediate);
         }
@@ -159,10 +161,11 @@ namespace RIVM.Instructions
 
         protected override void ExecuteImpl(CPU cpu)
         {
+            cpu.Registers[Register.SP] -= 4;
             cpu.Registers[Register.IP] = cpu.Memory[cpu.Registers[Register.SP]];
         }
 
-        public override string ToString()
+        protected override string _toString()
         {
             return "ret";
         }
@@ -192,6 +195,11 @@ namespace RIVM.Instructions
                 cpu.Flag = CompareFlag.GT;
             }
         }
+
+        protected override string _toString()
+        {
+            return String.Format("cmpi {0}, {1}", _r1, Immediate);
+        }
     }
 
     public class CmpR : UserModeInstruction
@@ -218,6 +226,11 @@ namespace RIVM.Instructions
                 cpu.Flag = CompareFlag.GT;
             }
         }
+
+        protected override string _toString()
+        {
+            return String.Format("cmpr {0}, {1}", _r1, _r2);
+        }
     }
 
     public class DivR : UserModeInstruction
@@ -231,6 +244,11 @@ namespace RIVM.Instructions
         {
             cpu.Registers[_r1] = cpu.Registers[_r2] / cpu.Registers[_r3];
         }
+
+        protected override string _toString()
+        {
+            return String.Format("div {0}, {1} -> {2}", _r2, _r3, _r1);
+        }
     }
 
     public class Halt : UserModeInstruction
@@ -243,6 +261,11 @@ namespace RIVM.Instructions
         protected override void ExecuteImpl(CPU cpu)
         {
             cpu.Halted = true;
+        }
+
+        protected override string _toString()
+        {
+            return "halt";
         }
     }
 
@@ -260,6 +283,11 @@ namespace RIVM.Instructions
                 cpu.Registers[Register.IP] = Immediate;
             }
         }
+
+        protected override string _toString()
+        {
+            return String.Format("jeq {0}", Immediate);
+        }
     }
 
     public class JGeI : UserModeInstruction
@@ -275,6 +303,11 @@ namespace RIVM.Instructions
             {
                 cpu.Registers[Register.IP] = Immediate;
             }
+        }
+
+        protected override string _toString()
+        {
+            return String.Format("jge {0}", Immediate);
         }
     }
 
@@ -292,6 +325,11 @@ namespace RIVM.Instructions
                 cpu.Registers[Register.IP] = Immediate;
             }
         }
+
+        protected override string _toString()
+        {
+            return String.Format("jgt {0}", Immediate);
+        }
     }
 
     public class JmpI : UserModeInstruction
@@ -304,6 +342,11 @@ namespace RIVM.Instructions
         protected override void ExecuteImpl(CPU cpu)
         {
             cpu.Registers[Register.IP] = Immediate;
+        }
+
+        protected override string _toString()
+        {
+            return String.Format("jmp {0}", Immediate);
         }
     }
 
@@ -321,6 +364,11 @@ namespace RIVM.Instructions
                 cpu.Registers[Register.IP] = Immediate;
             }
         }
+
+        protected override string _toString()
+        {
+            return String.Format("jle {0}", Immediate);
+        }
     }
 
     public class JLtI : UserModeInstruction
@@ -336,6 +384,11 @@ namespace RIVM.Instructions
             {
                 cpu.Registers[Register.IP] = Immediate;
             }
+        }
+
+        protected override string _toString()
+        {
+            return String.Format("jlt {0}", Immediate);
         }
     }
 
@@ -353,6 +406,11 @@ namespace RIVM.Instructions
                 cpu.Registers[Register.IP] = Immediate;
             }
         }
+
+        protected override string _toString()
+        {
+            return String.Format("jne {0}", Immediate);
+        }
     }
 
     public class JmpR : UserModeInstruction
@@ -366,6 +424,11 @@ namespace RIVM.Instructions
         {
             cpu.Registers[Register.IP] = cpu.Registers[_r1];
         }
+
+        protected override string _toString()
+        {
+            return String.Format("jmp {0}", _r1);
+        }
     }
 
     public class LoadI : UserModeInstruction
@@ -378,6 +441,11 @@ namespace RIVM.Instructions
         protected override void ExecuteImpl(CPU cpu)
         {
             cpu.Registers[_r1] = BitHelper.ExtractBytes(cpu.Memory[Immediate], _memoryAccessSize);
+        }
+
+        protected override string _toString()
+        {
+            return String.Format("load [{0}] -> {1}", Immediate, _r1);
         }
     }
 
@@ -395,6 +463,11 @@ namespace RIVM.Instructions
 
             cpu.Registers[_r1] = val;
         }
+
+        protected override string _toString()
+        {
+            return String.Format("load [{0}] -> {1}", _r2, _r1);
+        }
     }
 
     public class LoadIR : UserModeInstruction
@@ -407,6 +480,11 @@ namespace RIVM.Instructions
         protected override void ExecuteImpl(CPU cpu)
         {
             cpu.Registers[_r1] = BitHelper.ExtractBytes(cpu.Memory[cpu.Registers[_r2] + Immediate], _memoryAccessSize);
+        }
+
+        protected override string _toString()
+        {
+            return String.Format("load [{0} + {1}] -> {2}", _r2, Immediate, _r1);
         }
     }
 
@@ -424,6 +502,11 @@ namespace RIVM.Instructions
             {
                 cpu.Memory[cpu.Registers[_r1] + i] = cpu.Memory[cpu.Registers[_r2] + i];
             }
+        }
+
+        protected override string _toString()
+        {
+            return String.Format("memcpy {0} -> {1}, {2}", _r2, _r1, Immediate);
         }
     }
 
@@ -444,6 +527,11 @@ namespace RIVM.Instructions
                 cpu.Memory.PTEnabled = true;
             }
         }
+
+        protected override string _toString()
+        {
+            return String.Format("mov {0} -> {1}", Immediate, _r1);
+        }
     }
 
     public class MovR : UserModeInstruction
@@ -463,6 +551,11 @@ namespace RIVM.Instructions
                 cpu.Memory.PTEnabled = true;
             }
         }
+
+        protected override string _toString()
+        {
+            return String.Format("mov {0} -> {1}", _r2, _r1);
+        }
     }
 
     public class MultR : UserModeInstruction
@@ -475,6 +568,11 @@ namespace RIVM.Instructions
         protected override void ExecuteImpl(CPU cpu)
         {
             cpu.Registers[_r1] = cpu.Registers[_r2] * cpu.Registers[_r3];
+        }
+
+        protected override string _toString()
+        {
+            return String.Format("mult {0}, {1} -> {2}", _r2, _r3, _r1);
         }
     }
 
@@ -489,6 +587,11 @@ namespace RIVM.Instructions
         {
             //NOOP
         }
+
+        protected override string _toString()
+        {
+            return "noop";
+        }
     }
 
     public class OrR : UserModeInstruction
@@ -501,6 +604,11 @@ namespace RIVM.Instructions
         protected override void ExecuteImpl(CPU cpu)
         {
             cpu.Registers[_r1] = cpu.Registers[_r2] | cpu.Registers[_r3];
+        }
+
+        protected override string _toString()
+        {
+            return String.Format("or {0}, {1} -> {2}", _r2, _r3, _r1);
         }
     }
 
@@ -517,6 +625,11 @@ namespace RIVM.Instructions
 
             cpu.Registers[_r1] = cpu.Memory[cpu.Registers[Register.SP]];
         }
+
+        protected override string _toString()
+        {
+            return String.Format("pop {0}", _r1);
+        }
     }
 
     public class PushI : UserModeInstruction
@@ -531,6 +644,11 @@ namespace RIVM.Instructions
             cpu.Memory[cpu.Registers[Register.SP]] = Immediate;
 
             cpu.Registers[Register.SP] += 4;
+        }
+
+        protected override string _toString()
+        {
+            return String.Format("push {0}", Immediate);
         }
     }
 
@@ -547,6 +665,11 @@ namespace RIVM.Instructions
 
             cpu.Registers[Register.SP] += 4;
         }
+
+        protected override string _toString()
+        {
+            return String.Format("push {0}", _r1);
+        }
     }
 
     public class ShlR : UserModeInstruction
@@ -559,6 +682,11 @@ namespace RIVM.Instructions
         protected override void ExecuteImpl(CPU cpu)
         {
             cpu.Registers[_r1] = cpu.Registers[_r2] << cpu.Registers[_r3];
+        }
+
+        protected override string _toString()
+        {
+            return String.Format("shl {0}, {1} -> {2}", _r2, _r3, _r1);
         }
     }
 
@@ -573,6 +701,10 @@ namespace RIVM.Instructions
         {
             cpu.Registers[_r1] = cpu.Registers[_r2] >> cpu.Registers[_r3];
         }
+        protected override string _toString()
+        {
+            return String.Format("shr {0}, {1} -> {2}", _r2, _r3, _r1);
+        }
     }
 
     public class StoreI : UserModeInstruction
@@ -585,6 +717,11 @@ namespace RIVM.Instructions
         protected override void ExecuteImpl(CPU cpu)
         {
             cpu.Memory[Immediate] = cpu.Registers[_r1];
+        }
+
+        protected override string _toString()
+        {
+            return String.Format("store {0} -> [{1}]", _r1, Immediate);
         }
     }
 
@@ -599,6 +736,11 @@ namespace RIVM.Instructions
         {
             cpu.Memory[cpu.Registers[_r1]] = cpu.Registers[_r2];
         }
+
+        protected override string _toString()
+        {
+            return String.Format("store {0} -> [{1}]", _r2, _r1);
+        }
     }
 
     public class StoreIR : UserModeInstruction
@@ -611,6 +753,11 @@ namespace RIVM.Instructions
         protected override void ExecuteImpl(CPU cpu)
         {
             cpu.Memory[cpu.Registers[_r1] + Immediate] = cpu.Registers[_r2];
+        }
+
+        protected override string _toString()
+        {
+            return String.Format("store {0} -> [{1} + {2}]", _r2, _r1, Immediate);
         }
     }
 
@@ -625,6 +772,11 @@ namespace RIVM.Instructions
         {
             cpu.Registers[_r1] = cpu.Registers[_r2] - cpu.Registers[_r3];
         }
+
+        protected override string _toString()
+        {
+            return String.Format("sub {0}, {1} -> {2}", _r2, _r3, _r1);
+        }
     }
 
     public class XorR : UserModeInstruction
@@ -637,6 +789,11 @@ namespace RIVM.Instructions
         protected override void ExecuteImpl(CPU cpu)
         {
             cpu.Registers[_r1] = cpu.Registers[_r2] ^ cpu.Registers[_r3];
+        }
+
+        protected override string _toString()
+        {
+            return String.Format("xor {0}, {1} -> {2}", _r2, _r3, _r1);
         }
     }
 
@@ -651,6 +808,11 @@ namespace RIVM.Instructions
         {
             cpu.RaiseInterrupt(Immediate);
         }
+
+        protected override string _toString()
+        {
+            return String.Format("int {0}", Immediate);
+        }
     }
 
     public class IRet : UserModeInstruction
@@ -663,6 +825,13 @@ namespace RIVM.Instructions
         protected override void ExecuteImpl(CPU cpu)
         {
             cpu.KernelMode = false;
+            cpu.Registers[Register.SP] -= 4;
+            cpu.Registers[Register.IP] = cpu.Memory[cpu.Registers[Register.SP]];
+        }
+
+        protected override string _toString()
+        {
+            return String.Format("iret");
         }
     }
 
@@ -677,6 +846,11 @@ namespace RIVM.Instructions
         {
             cpu.InterruptsEnabled = false;
         }
+
+        protected override string _toString()
+        {
+            return String.Format("cli");
+        }
     }
 
     public class Sti : KernelModeInstruction
@@ -689,6 +863,11 @@ namespace RIVM.Instructions
         protected override void ExecuteImpl(CPU cpu)
         {
             cpu.InterruptsEnabled = true;
+        }
+
+        protected override string _toString()
+        {
+            return String.Format("sti");
         }
     }
 
@@ -703,6 +882,11 @@ namespace RIVM.Instructions
         {
             cpu.IDTPointer = Immediate;
         }
+
+        protected override string _toString()
+        {
+            return String.Format("setidt {0}", Immediate);
+        }
     }
 
     public class SetPT : KernelModeInstruction
@@ -715,6 +899,11 @@ namespace RIVM.Instructions
         protected override void ExecuteImpl(CPU cpu)
         {
             cpu.Memory.PTPointer = Immediate;
+        }
+
+        protected override string _toString()
+        {
+            return String.Format("setpt {0}", Immediate);
         }
     }
 
@@ -729,6 +918,11 @@ namespace RIVM.Instructions
         {
             cpu.Memory.InvalidateTLB();
         }
+
+        protected override string _toString()
+        {
+            return String.Format("tlbi");
+        }
     }
 
     public class Break : UserModeInstruction
@@ -740,7 +934,11 @@ namespace RIVM.Instructions
 
         protected override void ExecuteImpl(CPU cpu)
         {
-            ;
+        }
+
+        protected override string _toString()
+        {
+            return String.Format("brk");
         }
     }
 }
