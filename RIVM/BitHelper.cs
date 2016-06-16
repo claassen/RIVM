@@ -10,10 +10,10 @@ namespace RIVM
     {
         public static int ExtractBytes(int val, int numBytes)
         {
-            return (val & (int)CreateMemoryMask(numBytes)) >> ((4 - numBytes) * 8);
+            return (val & (int)CreateMask(numBytes)) >> ((4 - numBytes) * 8);
         }
 
-        private static uint CreateMemoryMask(int numBytes)
+        private static uint CreateMask(int numBytes)
         {
             switch (numBytes)
             {

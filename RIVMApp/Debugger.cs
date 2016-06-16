@@ -16,6 +16,9 @@ namespace RIVMApp
     {
         private VM _vm;
 
+        private int _memoryDisplayStartAddress;
+        private int _memoryDisplaySize = 4;
+
         public Debugger(VM vm)
         {
             InitializeComponent();
@@ -37,6 +40,7 @@ namespace RIVMApp
                 updateRegisterState(txtIP, Register.IP);
                 updateRegisterState(txtSP, Register.SP);
                 updateCurrentInstruction();
+                _memoryDisplayStartAddress = _vm.cpu.Registers[Register.IP];
                 updateMemoryDisplay();
                 updateStackDisplay();
             });
@@ -83,33 +87,42 @@ namespace RIVMApp
             dt.Columns.Add(new DataColumn("value", typeof(string)));
             dt.Columns.Add(new DataColumn("instruction", typeof(String)));
 
-            int start = _vm.cpu.Registers[Register.IP];
-            int end = start + 40;
+            int start = _memoryDisplayStartAddress;
+            int end = start + 1000;
 
             for (int address = start; address < end;)
             {
-                int machineCode = _vm.cpu.Memory.Get(address, false, 4);
-
-                object[] firstRowData = new object[3];
-                firstRowData[0] = address;
-                firstRowData[1] = machineCode;
-
-                address += 4;
-
-                Instruction instruction = InstructionDecoder.Decode(machineCode);
-
-                if (instruction.HasImmediate)
+                if (_memoryDisplaySize == 4)
                 {
-                    instruction.Immediate = _vm.cpu.Memory.Get(address, false, 4);
+                    int machineCode = _vm.cpu.Memory.Get(address, false, 4);
+
+                    object[] firstRowData = new object[3];
+                    firstRowData[0] = address;
+                    firstRowData[1] = machineCode;
+
                     address += 4;
+
+                    Instruction instruction = InstructionDecoder.Decode(machineCode);
+
+                    if (instruction.HasImmediate)
+                    {
+                        instruction.Immediate = _vm.cpu.Memory.Get(address, false, 4);
+                        address += 4;
+                    }
+
+                    firstRowData[2] = instruction.ToString();
+                    dt.Rows.Add(firstRowData);
+
+                    if (instruction.HasImmediate)
+                    {
+                        dt.Rows.Add(address - 4, instruction.Immediate, "[immediate value]");
+                    }
                 }
-
-                firstRowData[2] = instruction.ToString();
-                dt.Rows.Add(firstRowData);
-
-                if (instruction.HasImmediate)
+                else
                 {
-                    dt.Rows.Add(address - 4, instruction.Immediate, "[immediate value]");
+                    int value = BitHelper.ExtractBytes(_vm.cpu.Memory.Get(address, false, 1), 1);
+                    dt.Rows.Add(address, value, "");
+                    address++;
                 }
             }
 
@@ -179,6 +192,24 @@ namespace RIVMApp
         {
             setSteppingControlsEnabled(false);
             _vm.Continue();
+        }
+
+        private void btnGoToMem_Click(object sender, EventArgs e)
+        {
+            _memoryDisplayStartAddress = Convert.ToInt32(txtGoToMem.Text);
+            updateMemoryDisplay();
+        }
+
+        private void rd4Bytes_CheckedChanged(object sender, EventArgs e)
+        {
+            _memoryDisplaySize = 4;
+            updateMemoryDisplay();
+        }
+
+        private void rd1Byte_CheckedChanged(object sender, EventArgs e)
+        {
+            _memoryDisplaySize = 1;
+            updateMemoryDisplay();
         }
     }
 }

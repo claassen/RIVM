@@ -5,8 +5,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RIVM", "RIVM\RIVM.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RIVMApp", "RIVMApp\RIVMApp.csproj", "{48C0682F-9F2D-4D2B-BFDA-B468C8EA1698}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RIVMCli", "RIVMCli\RIVMCli.csproj", "{5189AA62-AD35-410F-9F17-1451ABD5D5CC}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,10 +19,6 @@ Global
 		{48C0682F-9F2D-4D2B-BFDA-B468C8EA1698}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48C0682F-9F2D-4D2B-BFDA-B468C8EA1698}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48C0682F-9F2D-4D2B-BFDA-B468C8EA1698}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5189AA62-AD35-410F-9F17-1451ABD5D5CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5189AA62-AD35-410F-9F17-1451ABD5D5CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5189AA62-AD35-410F-9F17-1451ABD5D5CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5189AA62-AD35-410F-9F17-1451ABD5D5CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
